@@ -183,7 +183,7 @@ state-and-fault estimator of Section 3 of the paper. At each step the
 estimator combines:
 
 - a **Kalman filter** for the augmented state $\mathbf{x}_k = (\eta^\intercal,
-  \bm\nu^\intercal)^\intercal \in \mathbb{R}^6$ (pose and velocity), run as an
+  \nu^\intercal)^\intercal \in \mathbb{R}^6$ (pose and velocity), run as an
   extended-Kalman variant because the Otter dynamics are nonlinear; and
 - a **recursive least squares with forgetting factor** $\lambda \in (0, 1]$ for
   the actuator-fault parameter $\theta = (\theta_u, \theta_r)^\intercal$,
@@ -196,22 +196,16 @@ estimator combines:
 | Sample period $T_s$                | $10^{-3}$ s                      |
 | Forgetting factor $\lambda$        | $0.995$                          |
 | Initial state covariance           | $\mathbf{P}_{0\mid 0} = \mathbf{0}$ |
-| Initial parameter covariance       | $\bm\Gamma_0 = 0.1\,\mathbf{I}_2$ |
-| Initial state-coupling gain        | $\bm\Pi_0 = \mathbf{0}$          |
+| Initial parameter covariance       | $\Gamma_0 = 0.1\,\mathbf{I}_2$ |
+| Initial state-coupling gain        | $\Pi_0 = \mathbf{0}$          |
 
 Each step writes an indicator vector to the shared state $\Xi_k$:
 
 ### Fault model
 
-Actuator faults are modelled as a multiplicative loss of effectiveness on each
-control channel, so that the input absorbed by the plant is $\mathbf{B}_k(\mathbf{I} -
-\operatorname{diag}(\bm\theta))\mathbf{u}_k$. The convention is $\bm\theta = \mathbf{0}$
-for healthy actuators and $\theta_u, \theta_r \to 1$ for total loss of the
-surge or yaw channel.
-
 The simulation in this repository injects two abrupt loss-of-effectiveness
-events during the 20 s run, the first at $t = 10$ s and the second at
-$t = 15$ s, recovering partial losses in the $0.2$–$0.3$ range on each
+events during the 20 s run, the first at $t = 5$ s and the second at
+$t = 10$ s, recovering partial losses in the $0.2$–$0.3$ range on each
 channel.
 
 ## Tool library
@@ -224,7 +218,7 @@ of the paper.
 |----|-----------------------------|-----------------|------------------------------------------------------------------------|
 | T1 | `get_fault_estimate`        | none            | $(\hat{\theta}_k,\;\operatorname{diag}(\Gamma_k)^{1/2})$         |
 | T2 | `get_state_estimate`        | none            | $(\hat{\mathbf{x}}_{k\mid k},\;\operatorname{diag}(\mathbf{P}_{k\mid k})^{1/2})$ |
-| T3 | `get_residual`              | none            | $(\tilde{\mathbf{y}}_k,\;\|\tilde{\mathbf{y}}_k\|^2_{\bm\Sigma_k^{-1}})$ |
+| T3 | `get_residual`              | none            | $(\tilde{\mathbf{y}}_k,\;\|\tilde{\mathbf{y}}_k\|^2_{\Sigma_k^{-1}})$ |
 | T4 | `evaluate_threshold`        | $\sigma > 0$    | per-component boolean significance test at threshold $\sigma$         |
 | T5 | `query_history`             | $\Delta k \in \mathbb{N}$ | sublist of $\mathcal{H}_k$ over the window $[k - \Delta k,\,k]$ |
 
