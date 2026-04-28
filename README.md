@@ -8,8 +8,8 @@ described in the paper:
 The system performs actuator-fault diagnosis on the **Otter**, a small
 under-actuated autonomous surface catamaran. A recursive joint state-and-fault
 estimator runs at the feature level and tracks the actuator-fault parameter
-$\bm{\theta} = (\theta_u, \theta_r)^\intercal$ together with its covariance
-$\bm{\Gamma}_k$. A locally-served LLM runs at the decision level and answers an
+$\theta = (\theta_u, \theta_r)^\intercal$ together with its covariance
+$\Gamma_k$. A locally-served LLM runs at the decision level and answers an
 operator's natural-language queries by orchestrating a small typed library of
 deterministic tools that read the estimator state. Every numerical token in
 the LLM's reply is, by construction, a verbatim copy of a value returned by
@@ -165,7 +165,7 @@ yaw — which is what makes the platform a useful testbed for fault diagnosis.
 |-------------------------|---------------------------------------------|
 | Hull form               | Catamaran                                   |
 | Actuation               | Two stern-mounted fixed propellers          |
-| Control inputs          | $\bm\tau_c = (\tau_u, \tau_r)^\intercal$    |
+| Control inputs          | $\tau_c = (\tau_u, \tau_r)^\intercal$    |
 | Pose measurement        | GNSS/IMU integration ($x, y, \psi$)         |
 | Model dimension         | $\mathbf{x} \in \mathbb{R}^6$ (pose + velocity) |
 | Sample period (sim)     | $T_s = 10^{-3}$ s                           |
@@ -178,16 +178,16 @@ parameter values.
 
 ## Feature-level model
 
-The behaviour model $\mathcal{M}_{\bm\theta}$ is the recursive joint
+The behaviour model $\mathcal{M}_{\theta}$ is the recursive joint
 state-and-fault estimator of Section 3 of the paper. At each step the
 estimator combines:
 
-- a **Kalman filter** for the augmented state $\mathbf{x}_k = (\bm\eta^\intercal,
+- a **Kalman filter** for the augmented state $\mathbf{x}_k = (\eta^\intercal,
   \bm\nu^\intercal)^\intercal \in \mathbb{R}^6$ (pose and velocity), run as an
   extended-Kalman variant because the Otter dynamics are nonlinear; and
 - a **recursive least squares with forgetting factor** $\lambda \in (0, 1]$ for
-  the actuator-fault parameter $\bm\theta = (\theta_u, \theta_r)^\intercal$,
-  coupled to the state filter through a sensitivity matrix $\bm\Pi_k$.
+  the actuator-fault parameter $\theta = (\theta_u, \theta_r)^\intercal$,
+  coupled to the state filter through a sensitivity matrix $\Pi_k$.
 
 | Parameter / setting                | Value                            |
 |------------------------------------|----------------------------------|
@@ -199,31 +199,12 @@ estimator combines:
 | Initial parameter covariance       | $\bm\Gamma_0 = 0.1\,\mathbf{I}_2$ |
 | Initial state-coupling gain        | $\bm\Pi_0 = \mathbf{0}$          |
 
-Each step writes an indicator vector to the shared state $\bm\Xi_k$:
-
-$$
-\mathbf{s}_k = \bigl(\hat{\bm\theta}_k^\intercal,\;
-                     \operatorname{vech}(\bm\Gamma_k)^\intercal,\;
-                     \tilde{\mathbf{y}}_k^\intercal,\;
-                     \|\tilde{\mathbf{y}}_k\|^2_{\bm\Sigma_k^{-1}}\bigr)^\intercal,
-$$
-
-i.e., the parameter estimate, the unique entries of its covariance, the
-innovation, and the normalised innovation squared. Threshold crossings on the
-last component populate the event log $\mathcal{H}_k$.
+Each step writes an indicator vector to the shared state $\Xi_k$:
 
 ### Fault model
 
 Actuator faults are modelled as a multiplicative loss of effectiveness on each
-control channel:
-
-$$
-\bm\Phi_k = -\mathbf{B}_k\,\operatorname{diag}(\mathbf{u}_k),
-\qquad
-\bm\theta = (\theta_u, \theta_r)^\intercal \in [0, 1]^2,
-$$
-
-so that the input absorbed by the plant is $\mathbf{B}_k(\mathbf{I} -
+control channel, so that the input absorbed by the plant is $\mathbf{B}_k(\mathbf{I} -
 \operatorname{diag}(\bm\theta))\mathbf{u}_k$. The convention is $\bm\theta = \mathbf{0}$
 for healthy actuators and $\theta_u, \theta_r \to 1$ for total loss of the
 surge or yaw channel.
@@ -235,13 +216,13 @@ channel.
 
 ## Tool library
 
-Five typed deterministic functions of the shared state $\bm\Xi_k$, called by
+Five typed deterministic functions of the shared state $\Xi_k$, called by
 the LLM through Ollama's tool interface (`tools.py`). The list matches Table 1
 of the paper.
 
 | ID | Tool                        | Argument        | Returns                                                                |
 |----|-----------------------------|-----------------|------------------------------------------------------------------------|
-| T1 | `get_fault_estimate`        | none            | $(\hat{\bm\theta}_k,\;\operatorname{diag}(\bm\Gamma_k)^{1/2})$         |
+| T1 | `get_fault_estimate`        | none            | $(\hat{\theta}_k,\;\operatorname{diag}(\Gamma_k)^{1/2})$         |
 | T2 | `get_state_estimate`        | none            | $(\hat{\mathbf{x}}_{k\mid k},\;\operatorname{diag}(\mathbf{P}_{k\mid k})^{1/2})$ |
 | T3 | `get_residual`              | none            | $(\tilde{\mathbf{y}}_k,\;\|\tilde{\mathbf{y}}_k\|^2_{\bm\Sigma_k^{-1}})$ |
 | T4 | `evaluate_threshold`        | $\sigma > 0$    | per-component boolean significance test at threshold $\sigma$         |
