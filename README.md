@@ -257,8 +257,7 @@ If you use this repository, please cite the paper:
 
 ```bibtex
 @article{hasan2026tooled,
-  title  = {From Hallucination to Verification: A Tool-Grounded Large Language
-            Model Architecture for Fault Diagnosis},
+  title  = {Large Language Models for Decision-Level Fusion in Fault Diagnosis},
   author = {Hasan, Agus},
   year   = {2026},
   note   = {Preprint}
