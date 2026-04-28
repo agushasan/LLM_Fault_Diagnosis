@@ -1,10 +1,9 @@
-# Tool-Grounded LLM for Fault Diagnosis on the Otter
+# Large Language Models for Decision-Level Fusion in Fault Diagnosis
 
 A reference implementation of the two-level information-fusion architecture
 described in the paper:
 
-> A. Hasan, *From Hallucination to Verification: A Tool-Grounded Large Language
-> Model Architecture for Fault Diagnosis*. Preprint, 2026.
+> A. Hasan, *Large Language Models for Decision-Level Fusion in Fault Diagnosis*. Preprint, 2026.
 
 The system performs actuator-fault diagnosis on the **Otter**, a small
 under-actuated autonomous surface catamaran. A recursive joint state-and-fault
