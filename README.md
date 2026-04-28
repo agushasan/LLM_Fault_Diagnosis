@@ -1,9 +1,4 @@
-# Large Language Models for Decision-Level Fusion in Fault Diagnosis
-
-A reference implementation of the two-level information-fusion architecture
-described in the paper:
-
-> A. Hasan, *Large Language Models for Decision-Level Fusion in Fault Diagnosis*. Preprint, 2026.
+# LLMs in Fault Diagnosis
 
 The system performs actuator-fault diagnosis on the **Otter**, a small
 under-actuated autonomous surface catamaran. A recursive joint state-and-fault
@@ -252,17 +247,6 @@ grounding and consistency propositions structural.
 | `Model not found`             | `ollama pull qwen3:8b`                                |
 
 ## Citation
-
-If you use this repository, please cite the paper:
-
-```bibtex
-@article{hasan2026tooled,
-  title  = {Large Language Models for Decision-Level Fusion in Fault Diagnosis},
-  author = {Hasan, Agus},
-  year   = {2026},
-  note   = {Preprint}
-}
-```
 
 ## License
 
